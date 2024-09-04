@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Registration;
-use Illuminate\Contracts\Routing\Registrar;
+
 
 class GuestController extends Controller
 {
@@ -81,7 +81,7 @@ class GuestController extends Controller
     }
     public function verify_email($email, $token)
     {
-        $result = Registration::whereEmail($email)->where('token', $token)->first();
+        $result = Registration::where('email', $email)->where('token', $token)->first();
         if (empty($result)) {
             session()->flash('error', 'Your account is not registered. Kindly register here.');
             return redirect('register');
