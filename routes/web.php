@@ -17,6 +17,12 @@ Route::get('contact', [GuestController::class, 'contact']);
 Route::post('register_action', [GuestController::class, 'register_action']);
 Route::get('verifyAccount/{email}/{token}', [GuestController::class, 'verify_email']);
 Route::post('checkAuthentication', [GuestController::class, 'login_action']);
+Route::get('ForgotPassword', [GuestController::class, 'forgot_password']);
+Route::post('SendOTP', [GuestController::class, 'send_otp']);
+Route::get('OTPForm', [GuestController::class, 'otp_form']);
+Route::post('OTPVerification', [GuestController::class, 'verify_otp']);
+Route::get('SetNewPassword', [GuestController::class, 'new_password']);
+Route::post('UpdateNewPassword', [GuestController::class, 'update_new_password']);
 
 // User Routes
 Route::middleware([UserAuthentication::class])->group(function () {

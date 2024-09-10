@@ -6,10 +6,29 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Registration;
+use App\Models\PasswordToken;
+use Carbon\Carbon;
+use Exception;
 
 
 class GuestController extends Controller
 {
+    public function delete_token()
+    {
+        session()->remove('error');
+        date_default_timezone_set("Asia/Kolkata");
+        $current_time = Carbon::now();
+        PasswordToken::where('expiry_time', '<', $current_time)->delete();
+    }
+    public function check_token_expiry()
+    {
+        $result = PasswordToken::where('email', session()->get('forgot_em'))->first();
+        if (empty($result)) {
+            session()->flash('error', 'OTP Expired');
+            return redirect('ForgotPassword');
+        }
+    }
+
     public function index()
     {
         return view('index');
@@ -125,6 +144,98 @@ class GuestController extends Controller
         } else {
             session()->flash('error', "Incorrect email address or password");
             return redirect('login');
+        }
+    }
+
+    public function forgot_password(Request $req)
+    {
+        return view('Forgot_password');
+    }
+    public function send_otp(Request $req)
+    {
+        $this->delete_token();
+
+        $em = $req->email;
+
+        $result = Registration::where('email', $em)->first();
+        if (empty($result)) {
+            session()->flash('error', 'Email id is not registered. please enter registered email address');
+            return redirect('ForgotPassword');
+        } else {
+
+            $result = PasswordToken::where('email', $req->email)->first();
+            if ($result) {
+                session()->flash('warning', 'A Password reset link is already sent to your mail please check. New link will be generated after old link expires');
+                return redirect('OTPForm');
+            } else {
+                date_default_timezone_set("Asia/Kolkata");
+                $otp = mt_rand(100000, 999999);
+                $data = Registration::where('email', $em)->first();
+                $data2 = array('name' => $data->name, 'email' => $em, 'otp' => $otp);
+                try {
+                    Mail::Send('mail_forget_pwd', ["data3" => $data2], function ($message) use ($data2) {
+                        $message->to($data2['email'], $data2['name'])->subject('Password Reset');
+                        $message->from('kansagrajanki@gmail.com', 'Janki Kansagra');
+                    });
+                } catch (Exception $ex) {
+                    session()->flash('error', 'We encountered some error in sending the password reset token');
+                    return redirect('ForgotPassword');
+                }
+                $expiry_time = Carbon::now()->addMinutes(2);
+                $token_ins = new PasswordToken();
+                $token_ins->email = $em;
+                $token_ins->otp = $otp;
+                session()->put('forgot_em', $em);
+                //   $token_ins->token = $token;
+                $token_ins->expiry_time = $expiry_time;
+                if ($token_ins->save()) {
+                    session()->flash('success', 'Password reset tokens sent to your registered email address');
+                    return redirect('OTPForm');
+                } else {
+                    session()->flash('error', 'Sorry the email address you entered is not registered.');
+                    return redirect('ForgotPassword');
+                }
+            }
+        }
+    }
+    public function otp_form(Request $r)
+    {
+        $this->delete_token();
+        $this->check_token_expiry();
+        return view('otp_form');
+    }
+    public function verify_otp(Request $req)
+    {
+        $this->delete_token();
+        $this->check_token_expiry();
+
+        $otp = $req->otp;
+        $result = PasswordToken::where('email', session()->get('forgot_em'))->first();
+        if ($result->otp == $otp) {
+            return redirect('SetNewPassword');
+        } else {
+            session()->flash('error', 'Incorrect OTP');
+            return view('otp_form');
+        }
+    }
+    public function new_password()
+    {
+        $this->delete_token();
+        $this->check_token_expiry();
+
+        return view('new_password');
+    }
+    public function update_new_password(Request $request)
+    {
+        $updt = Registration::where('email', session()->get('forgot_em'))->update(array('password' => $request->pswd));
+        if ($updt) {
+            PasswordToken::where('email', session()->get('forgot_em'))->delete();
+            session()->remove('forgot_em');
+            session()->flash('success', 'Password updated successfully');
+            return redirect('login');
+        } else {
+            session()->flash('error', 'Error in resetting password');
+            return redirect('ForgotPassword');
         }
     }
 }

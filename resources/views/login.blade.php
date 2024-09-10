@@ -64,7 +64,7 @@
                             <input class="form-check-input" type="checkbox" name="remember"> Remember me
                         </label>
                     </div>
-                    <a href="Forgot_password.php">
+                    <a href="{{ URL::to('/') }}/ForgotPassword">
                         Forgot Password?
                     </a>
                     <br>
