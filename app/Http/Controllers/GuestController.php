@@ -120,8 +120,6 @@ class GuestController extends Controller
     }
     public function login_action(Request $req)
     {
-        $reg = new Registration();
-
         $em = $req->email;
         $pwd = $req->pswd;
 
