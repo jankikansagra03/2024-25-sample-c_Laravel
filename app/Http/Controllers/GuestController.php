@@ -9,6 +9,8 @@ use App\Models\Registration;
 use App\Models\PasswordToken;
 use Carbon\Carbon;
 use Exception;
+use App\Models\ContactUs;
+
 
 
 class GuestController extends Controller
@@ -234,6 +236,22 @@ class GuestController extends Controller
         } else {
             session()->flash('error', 'Error in resetting password');
             return redirect('ForgotPassword');
+        }
+    }
+
+    public function add_inquiry(Request $request)
+    {
+        $inquiry = new ContactUs();
+        $inquiry->name = $request->fn;
+        $inquiry->email = $request->email;
+        $inquiry->message = $request->msg;
+        $inquiry->mobile = $request->mobile;
+        if ($inquiry->save()) {
+            session()->flash('success', 'Inquiry added successfully');
+            return redirect('contact');
+        } else {
+            session()->flash('error', 'Error in adding inquiry');
+            return redirect('contact');
         }
     }
 }

@@ -1,5 +1,4 @@
-@extends('guest_header')
-
+@extends('admin_header')
 @section('dynamic_section')
     <script>
         $(document).ready(function() {
@@ -61,29 +60,15 @@
     <div class="container">
         <div class="row text-center">
             <div class="col-12 bg-dark text-white p-4 align-center">
-                <h1>Contact Details</h1>
+                <h1>Add Inquiry</h1>
             </div>
         </div>
         <br>
-        <div class="row p-4">
-
-            <div class="col-xxl-4 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                <h1>Address</h1>
-                <h4><i class="fa-solid fa-location-dot"></i> Main Campus</h4>
-                RK University, <br> Bhavnagar Highway, Kasturbadham, <br> Rajkot, Gujarat, India 360020
-                <br><br>
-
-                <h4><i class="fa-solid fa-location-dot"></i> City Campus</h4>
-                New 150ft Ring Road,<br> Mota Mawa,Kalawad Road,<br> Rajkot, Gujarat, India 360004.
-                <br><br>
-                <h4><i class="fa-solid fa-phone-volume"></i> Contact Details </h4>
-                +91-9712489122 <br>
-                +91-9925714450
-
-            </div>
-            <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                <h1>Contact Form</h1>
-                <form action="{{ URL::to('/') }}/AddInquiry" method="post" enctype="multipart/form-data" id="form1">
+        <div class="row">
+            <div class="col-xxl-3 col-xl-3 col-lg-3 col-md-2"></div>
+            <div class="col-xxl-6 col-xl-6 col-lg-6 col-md-8 col-xs-12 col-sm-12">
+                <br>
+                <form action="{{ URL::to('/') }}/AddFAQAction" method="post" enctype="multipart/form-data" id="form1">
                     @csrf
                     <div class="form-group">
                         <label for="fn1"><b>Fullname:</b></label>
@@ -106,7 +91,7 @@
                         <textarea class="form-control" name="msg" id="msg1" cols="30" rows="5"></textarea>
                     </div>
                     <br>
-                    <input type="submit" class="btn btn-success" value="Submit" name="btn">
+                    <input type="submit" class="btn btn-dark" value="Submit" name="btn">
                 </form>
             </div>
         </div>
